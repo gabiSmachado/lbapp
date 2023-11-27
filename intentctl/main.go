@@ -11,57 +11,55 @@ import (
 )
 
 var (
-	_flagURI   = flag.String("uri", "localhost:5000", "server uri")
+	_flagURI   = flag.String("uri", "localhost:8000", "server uri")
 	_flagDebug = flag.Bool("debug", false, "enable debugging log")
 	_client    client.Client
 )
 
 func CreateIntent(args []string) error {
-	createIntentCmd := flag.NewFlagSet("create", flag.PanicOnError)
-	flagName := createIntentCmd.String("name", "undefined", "mnemonic for the intent")
-	flagMinimumCellOffset := createIntentCmd.Int("minimum-cell-offset", -1,
-		"minimum cell offset")
-	flagMaximumCellOffset := createIntentCmd.Int("maximum-cell-offset", -1,
-		"maximum cell offset")
-	flagMaximumLoadAverage := createIntentCmd.Int("maximum-load", -1,
-		"maximum cell load average")
-	flagMinimumThroughput := createIntentCmd.Int("minimum-throughput", -1,
-		"minimum throughput per ue")
-	flagMaximumUEPerCell := createIntentCmd.Int("maximum-ue-per-cell", -1,
-		"maximum ue per cell")
-	flagMaximumAssciationRate :=
-		createIntentCmd.Int("maximum-association-rate", -1,
-			"maximum number of associations accepted per second")
+	//createIntentCmd := flag.NewFlagSet("create", flag.PanicOnError)
+	//flagEvent := createIntentCmd.String("event", "undefined", "mnemonic for the intent")
+	var name, day, start, end, label string
+	var min, max int
+	var intent datamodel.Intent
 
-	createIntentCmd.Parse(args)
+	fmt.Println("Name:")
+	fmt.Scanln(&name)
 
-	var intent = datamodel.Intent{
-		Name: *flagName,
-	}
+	fmt.Println("Label:")
+	fmt.Scanln(&label)
 
-	if *flagMinimumCellOffset >= 0 {
-		intent.SetMinimumCellOffset(*flagMinimumCellOffset)
-	}
+	fmt.Println("Day of the Week:")
+	fmt.Scanln(&day)
 
-	if *flagMaximumCellOffset >= 0 {
-		intent.SetMaximumCellOffset(*flagMaximumCellOffset)
-	}
+	fmt.Println("Start Time:")
+	fmt.Scanln(&start)
 
-	if *flagMaximumLoadAverage >= 0 {
-		intent.SetMaximumLoadAverage(*flagMaximumLoadAverage)
-	}
+	fmt.Println("End Time:")
+	fmt.Scanln(&end)
 
-	if *flagMinimumThroughput >= 0 {
-		intent.SetMinimumThroughput(*flagMinimumThroughput)
-	}
+	fmt.Println("Minimum Cell Offset:")
+	fmt.Scanln(&min)
 
-	if *flagMaximumUEPerCell >= 0 {
-		intent.SetMaximumUEPerCell(*flagMaximumUEPerCell)
-	}
+	fmt.Println("Maximum Cell Offset:")
+	fmt.Scanln(&max)
 
-	if *flagMaximumAssciationRate >= 0 {
-		intent.SetMaximumAssociationRate(*flagMaximumAssciationRate)
-	}
+	intent = datamodel.Intent{
+		Name: name,
+		Condition: datamodel.Condition{
+			When: datamodel.When{
+				DayOfWeek: day,
+				TimeSpan: datamodel.TimeSpan{
+					StartTime: start,
+					EndTime:   end,
+				},
+			},
+			Labels: label,
+		},
+		Objective: datamodel.Objective{
+			MinimumCellOffset: min,
+			MaximumCellOffset: max,
+		}}
 
 	intentID, err := _client.IntentCreate(intent)
 	if err != nil {
@@ -76,7 +74,8 @@ func ListIntents() error {
 
 	if err == nil {
 		for _, intent := range intents {
-			fmt.Printf("%d %s\n", intent.Idx, intent.Name)
+			fmt.Printf("ID  NAME\n")
+			fmt.Printf("%d   %s\n", intent.Idx, intent.Name)
 		}
 	}
 

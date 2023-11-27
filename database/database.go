@@ -21,7 +21,13 @@ func CurrentId(db *sql.DB) (int, error) {
 func createTable(db *sql.DB) error {
 	_, err := db.Exec(`CREATE TABLE IF NOT EXISTS intents (
 		id int primary key AUTO_INCREMENT,
-		name varchar(255))`)
+		name varchar(255),
+		label varchar(255),
+		day_of_the_week varchar(255),
+		start_tiime varchar(255),
+		end_time varchar(255),
+		minimum_cell_offset int,
+		maximum_cell_offset int)`)
 
 	if err != nil {
 		panic(err.Error())
@@ -37,7 +43,10 @@ func createTable(db *sql.DB) error {
 }
 
 func Insert(db *sql.DB, intent datamodel.Intent) (int, error) {
-	_, err := db.Exec(`INSERT INTO intents (name) VALUES (?)`, intent.Name)
+	_, err := db.Exec(`INSERT INTO intents (name,label,day_of_the_week,start_tiime,end_time,
+		minimum_cell_offset,maximum_cell_offset) VALUES (?,?,?,?,?,?,?)`, intent.Name,
+		intent.Condition.Labels, intent.Condition.When.DayOfWeek, intent.Condition.When.TimeSpan.StartTime,
+		intent.Condition.When.TimeSpan.EndTime, intent.Objective.MinimumCellOffset, intent.Objective.MaximumCellOffset)
 	if err != nil {
 		log.Printf("Error %s when inserting in table", err)
 		return 0, err
@@ -47,7 +56,7 @@ func Insert(db *sql.DB, intent datamodel.Intent) (int, error) {
 }
 
 func ListIntents(db *sql.DB) ([]datamodel.Intent, error) {
-	rows, err := db.Query("SELECT * FROM intents")
+	rows, err := db.Query("SELECT id,name FROM intents")
 	if err != nil {
 		log.Printf("Error %s when listing intents", err)
 		return nil, err
@@ -95,9 +104,27 @@ func DBconnect() (*sql.DB, error) {
 }
 
 func IntentShow(db *sql.DB, id int) (datamodel.Intent, error) {
-	var name string
-	err := db.QueryRow("SELECT * FROM intents WHERE id = ?", id).Scan(&id, &name)
-	intent := datamodel.Intent{Idx: id, Name: name}
+	var name, day, start, end, label string
+	var min, max int
+	err := db.QueryRow("SELECT * FROM intents WHERE id = ?", id).Scan(&id, &name,
+		&label, &day, &start, &end, &min, &max)
+	intent := datamodel.Intent{
+		Idx:  id,
+		Name: name,
+		Condition: datamodel.Condition{
+			When: datamodel.When{
+				DayOfWeek: day,
+				TimeSpan: datamodel.TimeSpan{
+					StartTime: start,
+					EndTime:   end,
+				},
+			},
+			Labels: label,
+		},
+		Objective: datamodel.Objective{
+			MinimumCellOffset: min,
+			MaximumCellOffset: max,
+		}}
 
 	if err != nil {
 		log.Printf("Error %s when selecting intent", err)
@@ -120,5 +147,4 @@ func IntentShow(db *sql.DB, id int) (datamodel.Intent, error) {
 	//ShowIntent(db, 1)
 	//ListIntents(db)
 	//DeleteIntent(db, 1)
-}
-*/
+} */

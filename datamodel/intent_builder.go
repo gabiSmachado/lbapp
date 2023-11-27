@@ -1,16 +1,16 @@
 package datamodel
 
-func (i *Intent) SetMinimumCellOffset(offset int) *Intent {
+/* func (i *Objective) SetMinimumCellOffset(offset int) *Objective {
 	i.MinimumCellOffset = &offset
 	return i
 }
 
-func (i *Intent) UnsetMinimumCellOffset(offset int) *Intent {
+func (i *Objective) UnsetMinimumCellOffset(offset int) *Objective {
 	i.MinimumCellOffset = nil
 	return i
 }
 
-func (i *Intent) SetMaximumCellOffset(offset int) *Intent {
+func (i *Objective) SetMaximumCellOffset(offset int) *Objective {
 	i.MaximumCellOffset = &offset
 	return i
 }
@@ -34,3 +34,4 @@ func (i *Intent) SetMaximumAssociationRate(associationRate int) *Intent {
 	i.MaximumAssociationRate = &associationRate
 	return i
 }
+*/

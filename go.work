@@ -6,4 +6,5 @@ use (
 	./smoapp
 	./client
 	./database
+	./message_queue
 )
